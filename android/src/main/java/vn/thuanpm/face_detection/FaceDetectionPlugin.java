@@ -22,7 +22,7 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler {
   private MethodChannel channel;
   private static final String CHANNEL = "face_detection";
   private MobilePigo mobilePigo ;
-  private MobilePigoLandMark mobilePigoLandMark;
+//  private MobilePigoLandMark mobilePigoLandMark;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -41,14 +41,13 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler {
         }
         try {
             byte[] data = call.argument("data");
-            HashMap<String, Integer> ret = new HashMap<String, Integer>();
-            mobilePigo.getDetect(data);
-            ret.put("q", (int) mobilePigo.getQ());
-            ret.put("scale", (int) mobilePigo.getScale());
+            int rows =call.argument("rows");
+            int cols = call.argument("cols");
+            HashMap<String, Object> ret = new HashMap<String, Object>();
+            mobilePigo.getFacesDetect(data,cols,rows);
             ret.put("cols", (int) mobilePigo.getCols());
             ret.put("rows", (int) mobilePigo.getRows());
-            ret.put("row", (int) mobilePigo.getRow());
-            ret.put("col", (int) mobilePigo.getCol());
+            ret.put("faces", (String) mobilePigo.getFaces());
             result.success(ret);
             return;
         } catch (Exception e) {
@@ -57,43 +56,46 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler {
     } else if(call.method.equals("initDetectFace")){
          byte[] cascade = call.argument("cascade");
          try {
-             mobilePigo =   FaceDetection.startMobilePigo(cascade);
+             mobilePigo = FaceDetection.initFaceDetect(cascade);
+             System.out.println(cascade);
              result.success(true);
              return;
          }catch (Exception e){
              result.error("0", e.getMessage(), "error init detect face");
          }
 
-    }else if(call.method.equals("initFaceLandmark")){
-        byte[] facecascade = call.argument("facecascade");
-        byte[] puplocCascade = call.argument("puplocCascade");
-        byte[] lp38 = call.argument("lp38");
-        byte[] lp42 = call.argument("lp42");
-        byte[] lp44 = call.argument("lp44");
-        byte[] lp46 = call.argument("lp46");
-        byte[] lp81 = call.argument("lp81");
-        byte[] lp82 = call.argument("lp82");
-        byte[] lp84 = call.argument("lp84");
-        byte[] lp93 = call.argument("lp93");
-        byte[] lp312 = call.argument("lp312");
-        mobilePigoLandMark = FaceDetection.startMobilePigoLandMark(facecascade,puplocCascade,lp38,lp42,lp44,lp46,lp81,lp82,lp84,lp93,lp312)   ;
-        result.success("ok");
-    }else if(call.method.equals("runFaceLandmark")){
-
-        byte[] data = call.argument("data");
-        mobilePigoLandMark.getFaceLandMark(data);
-        HashMap<String, Integer> ret = new HashMap<String, Integer>();
-        ret.put("q", (int) mobilePigoLandMark.getQ());
-        ret.put("scale", (int) mobilePigoLandMark.getScale());
-        ret.put("cols", (int) mobilePigoLandMark.getCols());
-        ret.put("rows", (int) mobilePigoLandMark.getRows());
-        ret.put("row", (int) mobilePigoLandMark.getRow());
-        ret.put("col", (int) mobilePigoLandMark.getCol());
-        ret.put("noseCol", (int) mobilePigoLandMark.getNoseCol());
-        ret.put("noseRow", (int) mobilePigoLandMark.getNoseRow());
-        result.success(ret);
-        return;
     }
+//    else if(call.method.equals("initFaceLandmark")){
+//        byte[] facecascade = call.argument("facecascade");
+//        byte[] puplocCascade = call.argument("puplocCascade");
+//        byte[] lp38 = call.argument("lp38");
+//        byte[] lp42 = call.argument("lp42");
+//        byte[] lp44 = call.argument("lp44");
+//        byte[] lp46 = call.argument("lp46");
+//        byte[] lp81 = call.argument("lp81");
+//        byte[] lp82 = call.argument("lp82");
+//        byte[] lp84 = call.argument("lp84");
+//        byte[] lp93 = call.argument("lp93");
+//        byte[] lp312 = call.argument("lp312");
+//        mobilePigoLandMark = FaceDetection.startMobilePigoLandMark(facecascade,puplocCascade,lp38,lp42,lp44,lp46,lp81,lp82,lp84,lp93,lp312)   ;
+//        result.success("ok");
+//    }
+//    else if(call.method.equals("runFaceLandmark")){
+//
+//        byte[] data = call.argument("data");
+//        mobilePigoLandMark.getFaceLandMark(data);
+//        HashMap<String, Integer> ret = new HashMap<String, Integer>();
+//        ret.put("q", (int) mobilePigoLandMark.getQ());
+//        ret.put("scale", (int) mobilePigoLandMark.getScale());
+//        ret.put("cols", (int) mobilePigoLandMark.getCols());
+//        ret.put("rows", (int) mobilePigoLandMark.getRows());
+//        ret.put("row", (int) mobilePigoLandMark.getRow());
+//        ret.put("col", (int) mobilePigoLandMark.getCol());
+//        ret.put("noseCol", (int) mobilePigoLandMark.getNoseCol());
+//        ret.put("noseRow", (int) mobilePigoLandMark.getNoseRow());
+//        result.success(ret);
+//        return;
+//    }
     else {
       result.notImplemented();
     }

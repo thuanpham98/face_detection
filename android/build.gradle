@@ -16,6 +16,9 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+        flatDir{
+            dirs project(':face_detection').file('libs')
+        }
     }
 }
 
@@ -34,12 +37,12 @@ android {
     }
 }
 
-repositories{
-    flatDir{
-         dirs 'src/main/libs'
-    }
-}
+// repositories{
+//     flatDir{
+//          dirs project(':<plugin_name>').file('libs')
+//     }
+// }
 
-dependencies {                                                                                                          
-    implementation (name:"face_detection",ext:"aar")                                                                     
-} 
+dependencies {
+    implementation (name:'face_detection',ext:'aar')
+}

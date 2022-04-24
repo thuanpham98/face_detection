@@ -25,10 +25,13 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: ../
+  processing_camera_image: ^0.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  camera: ^0.9.4+20
+  rxdart: ^0.27.3
 
 dev_dependencies:
   flutter_test:
