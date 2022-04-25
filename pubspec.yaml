@@ -37,18 +37,16 @@ flutter:
   # To add assets to your plugin package, add an assets section, like this:
   assets:
     - packages/face_detection/assets/facefinder
-    # - test.png
-    # - facefinder
-    # - puploc
-    # - lp38
-    # - lp42
-    # - lp44
-    # - lp46
-    # - lp81
-    # - lp82
-    # - lp84
-    # - lp93
-    # - lp312
+    - packages/face_detection/assets/puploc
+    - packages/face_detection/assets/lp38
+    - packages/face_detection/assets/lp42
+    - packages/face_detection/assets/lp44
+    - packages/face_detection/assets/lp46
+    - packages/face_detection/assets/lp81
+    - packages/face_detection/assets/lp82
+    - packages/face_detection/assets/lp84
+    - packages/face_detection/assets/lp93
+    - packages/face_detection/assets/lp312
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

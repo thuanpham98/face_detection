@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -59,23 +60,26 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       if (currentImage != null) {
-        final retFace = await FaceDetection.getFaceDetect(
+        // await Future.delayed(Duration(milliseconds: 24));
+        await FaceDetection.getFaceDetect(
           currentImage,
-          value.height,
           value.width,
-        );
-        // if (retFace['faces'] != '') {
-        // final user = jsonDecode(retFace['faces']);
-        // print(user[0]['Scale']);
-        // a.sink.add({
-        //   "row": user[0]['Row'],
-        //   "col": user[0]['Col'],
-        //   'scale': user[0]['Scale'],
-        //   "rows": currentImage?.height,
-        //   "cols": currentImage?.width,
-        //   'q': user[0]['Q'],
-        // });
-        // }
+          value.height,
+        ).then((retFaces) {
+          print('Flutter :  ${retFaces}');
+          if (retFaces['faces'] != '') {
+            final user = jsonDecode(retFaces['faces']);
+            print(user[0]['Scale']);
+            a.sink.add({
+              "row": user[0]['Row'],
+              "col": user[0]['Col'],
+              'scale': user[0]['Scale'],
+              "rows": retFaces['rows'],
+              "cols": retFaces['cols'],
+              'q': user[0]['Q'],
+            });
+          }
+        });
       }
       stopwatch.stop();
       print('this is time process: ${stopwatch.elapsedMilliseconds}');
@@ -108,6 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> initCamera() async {
     await FaceDetection.initFaceDetect();
+    await FaceDetection.initFaceLandmark();
     final cameras = await availableCameras();
     _cameraController = CameraController(cameras[1], ResolutionPreset.low);
     await _cameraController.initialize();
