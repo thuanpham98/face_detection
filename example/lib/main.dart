@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+import 'package:face_detection/face_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:processing_camera_image/processing_camera_image.dart';
 import 'package:rxdart/rxdart.dart';
-
-import 'package:face_detection/face_detection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,27 +48,34 @@ class _MyHomePageState extends State<MyHomePage> {
     if (value != null) {
       stopwatch.start();
 
-      currentImage = await Future.microtask(() => processImage(value));
+      // currentImage = await Future.microtask(() => processImage(value));
+      final Uint8List? currentImage =
+          _processingCameraImage.processCameraImageToGray8Bit(
+        height: value.height,
+        width: value.width,
+        plane0: value.planes[0].bytes,
+        rotationAngle:
+            _cameraController.description.sensorOrientation.toDouble(),
+      );
 
       if (currentImage != null) {
-        print("Flutter : decode ${currentImage!.getBytes().length}");
         final retFace = await FaceDetection.getFaceDetect(
-          value.planes[0].bytes,
+          currentImage,
           value.height,
           value.width,
         );
-        if (retFace['faces'] != '') {
-          final user = jsonDecode(retFace['faces']);
-          print(user[0]['Scale']);
-          a.sink.add({
-            "row": user[0]['Row'],
-            "col": user[0]['Col'],
-            'scale': user[0]['Scale'],
-            "rows": currentImage?.height,
-            "cols": currentImage?.width,
-            'q': user[0]['Q'],
-          });
-        }
+        // if (retFace['faces'] != '') {
+        // final user = jsonDecode(retFace['faces']);
+        // print(user[0]['Scale']);
+        // a.sink.add({
+        //   "row": user[0]['Row'],
+        //   "col": user[0]['Col'],
+        //   'scale': user[0]['Scale'],
+        //   "rows": currentImage?.height,
+        //   "cols": currentImage?.width,
+        //   'q': user[0]['Q'],
+        // });
+        // }
       }
       stopwatch.stop();
       print('this is time process: ${stopwatch.elapsedMilliseconds}');
@@ -89,8 +94,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    pipe.listen(_processinngImage);
     _instanceInit = initCamera();
+    pipe.listen(_processinngImage);
+
     super.initState();
   }
 
@@ -155,12 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (snap.hasData) {
                   data = snap.data ??
                       {
-                        "row": 0,
-                        "rows": 0,
-                        "cols": 0,
-                        "col": 0,
-                        "scale": 0,
-                        'q': 0,
+                        "row": 1,
+                        "rows": 1,
+                        "cols": 1,
+                        "col": 1,
+                        "scale": 1,
+                        'q': 1,
                       };
                 }
                 // return Container();
