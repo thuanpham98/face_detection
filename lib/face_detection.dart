@@ -1,24 +1,71 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/services.dart' show rootBundle;
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/services.dart';
 
 class FaceDetection {
-  static const MethodChannel _channel = MethodChannel('face_detection');
+  static const MethodChannel _methodChannel = MethodChannel('face_detection');
+  static const EventChannel _eventChannel = EventChannel('faceDetectStream');
+  static Stream<Map<String, dynamic>>? _faceDetectStream;
+
+  static Stream<Map<String, dynamic>> get faceDetectStream {
+    _faceDetectStream ??= _eventChannel
+        .receiveBroadcastStream()
+        .map<Map<String, dynamic>>((event) {
+      if (event['type'] == "faceDetect") {
+        final results = jsonDecode(event['faces']);
+        return {
+          "row": results[0]['Row'],
+          "col": results[0]['Col'],
+          'scale': results[0]['Scale'],
+          "rows": event['rows'],
+          "cols": event['cols'],
+          'q': results[0]['Q'],
+        };
+      } else {
+        final results = jsonDecode(event['holes']);
+        List<Map<String, int>> points = [];
+        // print(results[0].length);
+        for (var i = 0; i < results[0].length; i++) {
+          if (i % 5 == 0) {
+            points.add({
+              'row': results[0][i],
+              'col': results[0][i + 1],
+              'scale': results[0][i + 2],
+              'q': results[0][i + 3]
+            });
+          }
+        }
+        // print(results);
+        final point = points[1];
+        print('${points[1]}----${points[2]}');
+        return {
+          "row": point['row'],
+          "col": point['col'],
+          'scale': point['scale'],
+          "rows": event['rows'],
+          "cols": event['cols'],
+          'q': point['q'],
+        };
+      }
+    });
+    return _faceDetectStream!;
+  }
 
   static Future<dynamic> initFaceDetect() async {
     final byteData =
         await rootBundle.load('packages/face_detection/assets/facefinder');
 
-    return await _channel.invokeMethod(
+    return await _methodChannel.invokeMethod(
         'initDetectFace', {'cascade': byteData.buffer.asUint8List()});
   }
 
   static Future<dynamic> getFaceDetect(
       Uint8List data, int rows, int cols) async {
-    return await _channel.invokeMethod(
-        'runDetectFace', {'data': data, 'rows': rows, 'cols': cols});
+    return await _methodChannel.invokeMethod(
+        'runFaceDetect', {'data': data, 'rows': rows, 'cols': cols});
   }
 
   static Future<dynamic> initFaceLandmark() async {
@@ -69,7 +116,7 @@ class FaceDetection {
     final Uint8List lp312Rawbytes = lp312Raw.buffer
         .asUint8List(lp312Raw.offsetInBytes, lp312Raw.lengthInBytes);
 
-    return await _channel.invokeMethod(
+    return await _methodChannel.invokeMethod(
       'initFaceLandmark',
       {
         "faceCascade": cascadebytes,
@@ -85,5 +132,11 @@ class FaceDetection {
         "lp312": lp312Rawbytes,
       },
     );
+  }
+
+  static Future<dynamic> getFaceLandMark(
+      Uint8List data, int rows, int cols) async {
+    return await _methodChannel.invokeMethod(
+        'runFaceLandmark', {'data': data, 'rows': rows, 'cols': cols});
   }
 }

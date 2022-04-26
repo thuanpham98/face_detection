@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.3'
     }
 }
 
@@ -28,20 +28,16 @@ android {
     compileSdkVersion 30
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     defaultConfig {
         minSdkVersion 21
     }
+    buildToolsVersion '30.0.2'
+    ndkVersion '24.0.8215888'
 }
-
-// repositories{
-//     flatDir{
-//          dirs project(':<plugin_name>').file('libs')
-//     }
-// }
 
 dependencies {
     implementation (name:'face_detection',ext:'aar')

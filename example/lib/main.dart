@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -42,12 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   late Future<void> _instanceInit;
   final pipe = BehaviorSubject<CameraImage?>.seeded(null);
   int count = 0;
+  int blink = 0;
   final ProcessingCameraImage _processingCameraImage = ProcessingCameraImage();
   imglib.Image? currentImage;
-  final stopwatch = Stopwatch();
+  // final stopwatch = Stopwatch();
   void _processinngImage(CameraImage? value) async {
     if (value != null) {
-      stopwatch.start();
+      // stopwatch.start();
 
       // currentImage = await Future.microtask(() => processImage(value));
       final Uint8List? currentImage =
@@ -56,34 +56,22 @@ class _MyHomePageState extends State<MyHomePage> {
         width: value.width,
         plane0: value.planes[0].bytes,
         rotationAngle:
-            _cameraController.description.sensorOrientation.toDouble(),
+            _cameraController.description.sensorOrientation.toDouble() == 0.0
+                ? 270
+                : _cameraController.description.sensorOrientation.toDouble(),
       );
 
       if (currentImage != null) {
         // await Future.delayed(Duration(milliseconds: 24));
-        await FaceDetection.getFaceDetect(
+        await FaceDetection.getFaceLandMark(
           currentImage,
           value.width,
           value.height,
-        ).then((retFaces) {
-          print('Flutter :  ${retFaces}');
-          if (retFaces['faces'] != '') {
-            final user = jsonDecode(retFaces['faces']);
-            print(user[0]['Scale']);
-            a.sink.add({
-              "row": user[0]['Row'],
-              "col": user[0]['Col'],
-              'scale': user[0]['Scale'],
-              "rows": retFaces['rows'],
-              "cols": retFaces['cols'],
-              'q': user[0]['Q'],
-            });
-          }
-        });
+        );
       }
-      stopwatch.stop();
-      print('this is time process: ${stopwatch.elapsedMilliseconds}');
-      stopwatch.reset();
+      // stopwatch.stop();
+      // print('this is time process: ${stopwatch.elapsedMilliseconds}');
+      // stopwatch.reset();
     }
   }
 
@@ -117,7 +105,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _cameraController = CameraController(cameras[1], ResolutionPreset.low);
     await _cameraController.initialize();
     await _cameraController.startImageStream((image) {
-      pipe.sink.add(image);
+      count++;
+      if (count % 2 == 0) {
+        pipe.sink.add(image);
+      }
     });
   }
 
@@ -143,24 +134,21 @@ class _MyHomePageState extends State<MyHomePage> {
               top: 0,
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                child: AspectRatio(
-                  aspectRatio: 3 / 4,
-                  child: FutureBuilder<void>(
-                    future: _instanceInit,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return CameraPreview(
-                          _cameraController,
-                        );
-                      }
-                      return CircularProgressIndicator();
-                    },
-                  ),
+                child: FutureBuilder<void>(
+                  future: _instanceInit,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return CameraPreview(
+                        _cameraController,
+                      );
+                    }
+                    return CircularProgressIndicator();
+                  },
                 ),
               ),
             ),
             StreamBuilder<Map<String, dynamic>>(
-              stream: a.stream.distinct(),
+              stream: FaceDetection.faceDetectStream.distinct(),
               builder: (context, snap) {
                 Map<String, dynamic> data = {};
                 if (snap.hasData) {
@@ -173,6 +161,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         "scale": 1,
                         'q': 1,
                       };
+                }
+                if ((data['q'] as int) < 30) {
+                  blink++;
                 }
                 // return Container();
 
@@ -202,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         (data['cols'] ?? 1) *
                         (data['scale'] ?? 1),
                     child: Text(
-                      "${data['q']}",
+                      "${blink}",
                       style: TextStyle(fontSize: 24),
                     ),
                     alignment: Alignment.center,
