@@ -42,36 +42,34 @@ class _MyHomePageState extends State<MyHomePage> {
   final pipe = BehaviorSubject<CameraImage?>.seeded(null);
   int count = 0;
   int blink = 0;
+  int frame = 0;
+  bool preFrame = false;
+  double holePoint = 0;
   final ProcessingCameraImage _processingCameraImage = ProcessingCameraImage();
   imglib.Image? currentImage;
-  // final stopwatch = Stopwatch();
+  final Stopwatch stopwatch = Stopwatch();
+
   void _processinngImage(CameraImage? value) async {
     if (value != null) {
-      // stopwatch.start();
-
-      // currentImage = await Future.microtask(() => processImage(value));
-      final Uint8List? currentImage =
+      final Uint8List? currentImage = await Future.microtask(() =>
           _processingCameraImage.processCameraImageToGray8Bit(
-        height: value.height,
-        width: value.width,
-        plane0: value.planes[0].bytes,
-        rotationAngle:
-            _cameraController.description.sensorOrientation.toDouble() == 0.0
+            height: value.height,
+            width: value.width,
+            plane0: value.planes[0].bytes,
+            rotationAngle: _cameraController.description.sensorOrientation
+                        .toDouble() ==
+                    0.0
                 ? 270
                 : _cameraController.description.sensorOrientation.toDouble(),
-      );
+          ));
 
       if (currentImage != null) {
-        // await Future.delayed(Duration(milliseconds: 24));
         await FaceDetection.getFaceLandMark(
           currentImage,
           value.width,
           value.height,
         );
       }
-      // stopwatch.stop();
-      // print('this is time process: ${stopwatch.elapsedMilliseconds}');
-      // stopwatch.reset();
     }
   }
 
@@ -112,12 +110,91 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  imglib.Image? processImage(CameraImage _savedImage) {
-    return _processingCameraImage.processCameraImageToGray(
-      height: _savedImage.height,
-      width: _savedImage.width,
-      plane0: _savedImage.planes[0].bytes,
-      rotationAngle: 270,
+  // imglib.Image? processImage(CameraImage _savedImage) {
+  //   return _processingCameraImage.processCameraImageToGray(
+  //     height: _savedImage.height,
+  //     width: _savedImage.width,
+  //     plane0: _savedImage.planes[0].bytes,
+  //     rotationAngle: 270,
+  //   );
+  // }
+
+  Widget _buildHoldWidget(BuildContext context, int idx) {
+    return /////////////-----33333--------//
+        StreamBuilder<Map<String, dynamic>>(
+      stream: FaceDetection.faceDetectStream(
+              type: FaceDetectionStreamType.faceLandMark)
+          .distinct(),
+      builder: (context, snap) {
+        Map<String, dynamic> data = {};
+        if (snap.hasData) {
+          List<Map<String, int>> points = [];
+
+          for (var i = 0; i < snap.data?['holes'][0].length; i++) {
+            if (i % 5 == 0) {
+              points.add({
+                'rows': snap.data?['rows'],
+                'cols': snap.data?['cols'],
+                'row': snap.data?['holes'][0][i],
+                'col': snap.data?['holes'][0][i + 1],
+                'scale': snap.data?['holes'][0][i + 2],
+                'q': snap.data?['holes'][0][i + 3]
+              });
+            }
+          }
+          points.sort((a, b) => ((a['col'] ?? 0) - (b['col'] ?? 0)));
+          if (points.length > idx) {
+            data = points[idx];
+          }
+          // holePoint += data['q'] ?? 0;
+          // if (count % 8 == 0) {
+          //   print(holePoint / 3);
+          //   if (holePoint / 3 < 50) {
+          //     blink++;
+          //   }
+          //   holePoint = 0;
+          // }
+          if (data['q'] < 50) {
+            blink++;
+          }
+        }
+
+        if (data.isEmpty) {
+          return SizedBox.shrink();
+        }
+        return Positioned(
+          left: -0.5 *
+                  ((MediaQuery.of(context).size.width) /
+                      (data['cols'] ?? 1) *
+                      (data['scale'] ?? 1)) +
+              ((MediaQuery.of(context).size.width) /
+                  (data['cols'] ?? 1) *
+                  (data['col'] ?? 1)),
+          top: -0.5 *
+                  ((MediaQuery.of(context).size.width) /
+                      (data['cols'] ?? 1) *
+                      (data['scale'] ?? 1)) +
+              ((MediaQuery.of(context).size.width) /
+                  (data['cols'] ?? 1) *
+                  (data['row'] ?? 1)),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+            ),
+            width: (MediaQuery.of(context).size.width) /
+                (data['cols'] ?? 1) *
+                (data['scale'] ?? 1),
+            height: (MediaQuery.of(context).size.width) /
+                (data['cols'] ?? 1) *
+                (data['scale'] ?? 1),
+            child: Text(
+              "${blink}",
+              style: TextStyle(fontSize: 13),
+            ),
+            alignment: Alignment.center,
+          ),
+        );
+      },
     );
   }
 
@@ -147,60 +224,95 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            StreamBuilder<Map<String, dynamic>>(
-              stream: FaceDetection.faceDetectStream.distinct(),
-              builder: (context, snap) {
-                Map<String, dynamic> data = {};
-                if (snap.hasData) {
-                  data = snap.data ??
-                      {
-                        "row": 1,
-                        "rows": 1,
-                        "cols": 1,
-                        "col": 1,
-                        "scale": 1,
-                        'q': 1,
-                      };
-                }
-                if ((data['q'] as int) < 30) {
-                  blink++;
-                }
-                // return Container();
+            // StreamBuilder<Map<String, dynamic>>(
+            //   stream: FaceDetection.faceDetectStream(
+            //           type: FaceDetectionStreamType.faceLandMark)
+            //       .distinct(),
+            //   builder: (context, snap) {
+            //     Map<String, dynamic> data = {};
+            //     if (snap.hasData) {
+            //       List<Map<String, int>> points = [];
 
-                return Positioned(
-                  left: -0.5 *
-                          ((MediaQuery.of(context).size.width) /
-                              (data['cols'] ?? 1) *
-                              (data['scale'] ?? 1)) +
-                      ((MediaQuery.of(context).size.width) /
-                          (data['cols'] ?? 1) *
-                          (data['col'] ?? 1)),
-                  top: -0.5 *
-                          ((MediaQuery.of(context).size.width) /
-                              (data['cols'] ?? 1) *
-                              (data['scale'] ?? 1)) +
-                      ((MediaQuery.of(context).size.width) /
-                          (data['cols'] ?? 1) *
-                          (data['row'] ?? 1)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                    ),
-                    width: (MediaQuery.of(context).size.width) /
-                        (data['cols'] ?? 1) *
-                        (data['scale'] ?? 1),
-                    height: (MediaQuery.of(context).size.width) /
-                        (data['cols'] ?? 1) *
-                        (data['scale'] ?? 1),
-                    child: Text(
-                      "${blink}",
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    alignment: Alignment.center,
-                  ),
-                );
-              },
-            ),
+            //       for (var i = 0; i < snap.data?['holes'][0].length; i++) {
+            //         if (i % 5 == 0) {
+            //           points.add({
+            //             'rows': snap.data?['rows'],
+            //             'cols': snap.data?['cols'],
+            //             'row': snap.data?['holes'][0][i],
+            //             'col': snap.data?['holes'][0][i + 1],
+            //             'scale': snap.data?['holes'][0][i + 2],
+            //             'q': snap.data?['holes'][0][i + 3]
+            //           });
+            //         }
+            //       }
+            //       points.sort((a, b) => ((a['col'] ?? 0) - (b['col'] ?? 0)));
+
+            //     }
+            //     if (data.isEmpty) {
+            //       return SizedBox.shrink();
+            //     }
+            //     return Positioned(
+            //       left: -0.5 *
+            //               ((MediaQuery.of(context).size.width) /
+            //                   (data['cols'] ?? 1) *
+            //                   (data['scale'] ?? 1)) +
+            //           ((MediaQuery.of(context).size.width) /
+            //               (data['cols'] ?? 1) *
+            //               (data['col'] ?? 1)),
+            //       top: -0.5 *
+            //               ((MediaQuery.of(context).size.width) /
+            //                   (data['cols'] ?? 1) *
+            //                   (data['scale'] ?? 1)) +
+            //           ((MediaQuery.of(context).size.width) /
+            //               (data['cols'] ?? 1) *
+            //               (data['row'] ?? 1)),
+            //       child: Container(
+            //         decoration: BoxDecoration(
+            //           border: Border.all(),
+            //         ),
+            //         width: (MediaQuery.of(context).size.width) /
+            //             (data['cols'] ?? 1) *
+            //             (data['scale'] ?? 1),
+            //         height: (MediaQuery.of(context).size.width) /
+            //             (data['cols'] ?? 1) *
+            //             (data['scale'] ?? 1),
+            //         child: Text(
+            //           "$blink",
+            //           style: TextStyle(fontSize: 13),
+            //         ),
+            //         alignment: Alignment.center,
+            //       ),
+            //     );
+            //   },
+            // ),
+
+            /////////////---------------//
+            // _buildHoldWidget(context, 0),
+
+            // _buildHoldWidget(context, 1),
+
+            // _buildHoldWidget(context, 2),
+
+            _buildHoldWidget(context, 0),
+
+            // _buildHoldWidget(context, 4),
+
+            // _buildHoldWidget(context, 5),
+
+            // _buildHoldWidget(context, 6),
+            // _buildHoldWidget(context, 7),
+            // _buildHoldWidget(context, 8),
+            // _buildHoldWidget(context, 9),
+            // _buildHoldWidget(context, 10),
+            // _buildHoldWidget(context, 11),
+            // _buildHoldWidget(context, 12),
+            // _buildHoldWidget(context, 13),
+
+            // _buildHoldWidget(context, 14),
+            // _buildHoldWidget(context, 15),
+
+            // _buildHoldWidget(context, 16),
+            // _buildHoldWidget(context, 17),
           ],
         ),
       ),

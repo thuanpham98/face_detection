@@ -2,54 +2,39 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/services.dart';
+
+enum FaceDetectionStreamType {
+  faceDetect,
+  faceLandMark,
+}
 
 class FaceDetection {
   static const MethodChannel _methodChannel = MethodChannel('face_detection');
   static const EventChannel _eventChannel = EventChannel('faceDetectStream');
   static Stream<Map<String, dynamic>>? _faceDetectStream;
 
-  static Stream<Map<String, dynamic>> get faceDetectStream {
+  static Stream<Map<String, dynamic>> faceDetectStream(
+      {required FaceDetectionStreamType type}) {
     _faceDetectStream ??= _eventChannel
         .receiveBroadcastStream()
         .map<Map<String, dynamic>>((event) {
-      if (event['type'] == "faceDetect") {
-        final results = jsonDecode(event['faces']);
+      if (event['type'] == FaceDetectionStreamType.faceDetect.name) {
+        final faces = jsonDecode(event['faces']);
         return {
-          "row": results[0]['Row'],
-          "col": results[0]['Col'],
-          'scale': results[0]['Scale'],
           "rows": event['rows'],
           "cols": event['cols'],
-          'q': results[0]['Q'],
+          "faces": faces,
         };
-      } else {
-        final results = jsonDecode(event['holes']);
-        List<Map<String, int>> points = [];
-        // print(results[0].length);
-        for (var i = 0; i < results[0].length; i++) {
-          if (i % 5 == 0) {
-            points.add({
-              'row': results[0][i],
-              'col': results[0][i + 1],
-              'scale': results[0][i + 2],
-              'q': results[0][i + 3]
-            });
-          }
-        }
-        // print(results);
-        final point = points[1];
-        print('${points[1]}----${points[2]}');
+      } else if (event['type'] == FaceDetectionStreamType.faceLandMark.name) {
+        final holes = jsonDecode(event['holes']);
         return {
-          "row": point['row'],
-          "col": point['col'],
-          'scale': point['scale'],
           "rows": event['rows'],
           "cols": event['cols'],
-          'q': point['q'],
+          'holes': holes,
         };
       }
+      return {};
     });
     return _faceDetectStream!;
   }
