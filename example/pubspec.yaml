@@ -6,7 +6,7 @@ description: Demonstrates how to use the face_detection plugin.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: ">=2.16.2 <3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -25,12 +25,12 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: ../
-  processing_camera_image: ^0.0.3
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+    # The following adds the Cupertino Icons font to your application.
+    # Use with the CupertinoIcons class for iOS style icons.
+  processing_camera_image: ^0.0.4
   cupertino_icons: ^1.0.2
-  camera: ^0.9.4+20
+  camera: ^0.9.4+21
   rxdart: ^0.27.3
 
 dev_dependencies:

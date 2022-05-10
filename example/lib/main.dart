@@ -40,53 +40,28 @@ class _MyHomePageState extends State<MyHomePage> {
   late final CameraController _cameraController;
   late Future<void> _instanceInit;
   final pipe = BehaviorSubject<CameraImage?>.seeded(null);
-  int count = 0;
-  int blink = 0;
-  int frame = 0;
-  bool preFrame = false;
-  double holePoint = 0;
   final ProcessingCameraImage _processingCameraImage = ProcessingCameraImage();
   imglib.Image? currentImage;
-  final Stopwatch stopwatch = Stopwatch();
+
+  int count = 0;
 
   void _processinngImage(CameraImage? value) async {
     if (value != null) {
-      final Uint8List? currentImage = await Future.microtask(() =>
-          _processingCameraImage.processCameraImageToGray8Bit(
-            height: value.height,
-            width: value.width,
-            plane0: value.planes[0].bytes,
-            rotationAngle: _cameraController.description.sensorOrientation
-                        .toDouble() ==
-                    0.0
-                ? 270
-                : _cameraController.description.sensorOrientation.toDouble(),
-          ));
-
+      currentImage = await Future.microtask(() => processImage(value));
       if (currentImage != null) {
-        await FaceDetection.getFaceLandMark(
-          currentImage,
-          value.width,
-          value.height,
-        );
+        // await FaceDetection.getFaceLandMark(
+        //   currentImage,
+        //   value.width,
+        //   value.height,
+        // );
       }
     }
   }
 
-  final a = BehaviorSubject<Map<String, dynamic>>.seeded({
-    "row": 0,
-    "rows": 0,
-    "cols": 0,
-    "col": 0,
-    "scale": 0,
-    'q': 0,
-  });
-
   @override
   void initState() {
-    _instanceInit = initCamera();
     pipe.listen(_processinngImage);
-
+    _instanceInit = initCamera();
     super.initState();
   }
 
@@ -97,223 +72,74 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initCamera() async {
-    await FaceDetection.initFaceDetect();
-    await FaceDetection.initFaceLandmark();
+    await FaceDetection.initFaceDetect().then((value) => print(value));
     final cameras = await availableCameras();
-    _cameraController = CameraController(cameras[1], ResolutionPreset.low);
+    _cameraController = CameraController(cameras[1], ResolutionPreset.low,
+        imageFormatGroup: ImageFormatGroup.yuv420);
     await _cameraController.initialize();
     await _cameraController.startImageStream((image) {
-      count++;
-      if (count % 2 == 0) {
-        pipe.sink.add(image);
-      }
+      pipe.sink.add(image);
     });
   }
 
-  // imglib.Image? processImage(CameraImage _savedImage) {
-  //   return _processingCameraImage.processCameraImageToGray(
-  //     height: _savedImage.height,
-  //     width: _savedImage.width,
-  //     plane0: _savedImage.planes[0].bytes,
-  //     rotationAngle: 270,
-  //   );
-  // }
-
-  Widget _buildHoldWidget(BuildContext context, int idx) {
-    return /////////////-----33333--------//
-        StreamBuilder<Map<String, dynamic>>(
-      stream: FaceDetection.faceDetectStream(
-              type: FaceDetectionStreamType.faceLandMark)
-          .distinct(),
-      builder: (context, snap) {
-        Map<String, dynamic> data = {};
-        if (snap.hasData) {
-          List<Map<String, int>> points = [];
-
-          for (var i = 0; i < snap.data?['holes'][0].length; i++) {
-            if (i % 5 == 0) {
-              points.add({
-                'rows': snap.data?['rows'],
-                'cols': snap.data?['cols'],
-                'row': snap.data?['holes'][0][i],
-                'col': snap.data?['holes'][0][i + 1],
-                'scale': snap.data?['holes'][0][i + 2],
-                'q': snap.data?['holes'][0][i + 3]
-              });
-            }
-          }
-          points.sort((a, b) => ((a['col'] ?? 0) - (b['col'] ?? 0)));
-          if (points.length > idx) {
-            data = points[idx];
-          }
-          // holePoint += data['q'] ?? 0;
-          // if (count % 8 == 0) {
-          //   print(holePoint / 3);
-          //   if (holePoint / 3 < 50) {
-          //     blink++;
-          //   }
-          //   holePoint = 0;
-          // }
-          if (data['q'] < 50) {
-            blink++;
-          }
-        }
-
-        if (data.isEmpty) {
-          return SizedBox.shrink();
-        }
-        return Positioned(
-          left: -0.5 *
-                  ((MediaQuery.of(context).size.width) /
-                      (data['cols'] ?? 1) *
-                      (data['scale'] ?? 1)) +
-              ((MediaQuery.of(context).size.width) /
-                  (data['cols'] ?? 1) *
-                  (data['col'] ?? 1)),
-          top: -0.5 *
-                  ((MediaQuery.of(context).size.width) /
-                      (data['cols'] ?? 1) *
-                      (data['scale'] ?? 1)) +
-              ((MediaQuery.of(context).size.width) /
-                  (data['cols'] ?? 1) *
-                  (data['row'] ?? 1)),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-            ),
-            width: (MediaQuery.of(context).size.width) /
-                (data['cols'] ?? 1) *
-                (data['scale'] ?? 1),
-            height: (MediaQuery.of(context).size.width) /
-                (data['cols'] ?? 1) *
-                (data['scale'] ?? 1),
-            child: Text(
-              "${blink}",
-              style: TextStyle(fontSize: 13),
-            ),
-            alignment: Alignment.center,
-          ),
-        );
-      },
+  imglib.Image? processImage(CameraImage _savedImage) {
+    // return _processingCameraImage.processCameraImageToRGBIOS(
+    //   bytesPerPixelPlan1: 2,
+    //   bytesPerRowPlane0: _savedImage.planes[0].bytesPerRow,
+    //   bytesPerRowPlane1: _savedImage.planes[0].bytesPerRow,
+    //   height: _savedImage.height,
+    //   plane0: _savedImage.planes[0].bytes,
+    //   plane1: _savedImage.planes[1].bytes,
+    //   rotationAngle: 0,
+    //   width: _savedImage.width,
+    // );
+    return _processingCameraImage.processCameraImageToGrayIOS(
+      height: _savedImage.height,
+      width: _savedImage.width,
+      plane0: _savedImage.planes[0].bytes,
+      rotationAngle: 0,
+      backGroundColor: Colors.red.value,
+      isFlipVectical: false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+      floatingActionButton: InkWell(
+        child: Container(
+          color: Colors.white.withOpacity(0.0),
+          height: 36,
+          width: 36,
+          child: const Icon(Icons.photo_camera),
+        ),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Scaffold(
+                        body: Center(
+                          child: Image.memory(Uint8List.fromList(
+                              imglib.encodeJpg(currentImage!))),
+                        ),
+                      )));
+        },
       ),
       body: Center(
-        child: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                child: FutureBuilder<void>(
-                  future: _instanceInit,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return CameraPreview(
-                        _cameraController,
-                      );
-                    }
-                    return CircularProgressIndicator();
-                  },
-                ),
-              ),
-            ),
-            // StreamBuilder<Map<String, dynamic>>(
-            //   stream: FaceDetection.faceDetectStream(
-            //           type: FaceDetectionStreamType.faceLandMark)
-            //       .distinct(),
-            //   builder: (context, snap) {
-            //     Map<String, dynamic> data = {};
-            //     if (snap.hasData) {
-            //       List<Map<String, int>> points = [];
-
-            //       for (var i = 0; i < snap.data?['holes'][0].length; i++) {
-            //         if (i % 5 == 0) {
-            //           points.add({
-            //             'rows': snap.data?['rows'],
-            //             'cols': snap.data?['cols'],
-            //             'row': snap.data?['holes'][0][i],
-            //             'col': snap.data?['holes'][0][i + 1],
-            //             'scale': snap.data?['holes'][0][i + 2],
-            //             'q': snap.data?['holes'][0][i + 3]
-            //           });
-            //         }
-            //       }
-            //       points.sort((a, b) => ((a['col'] ?? 0) - (b['col'] ?? 0)));
-
-            //     }
-            //     if (data.isEmpty) {
-            //       return SizedBox.shrink();
-            //     }
-            //     return Positioned(
-            //       left: -0.5 *
-            //               ((MediaQuery.of(context).size.width) /
-            //                   (data['cols'] ?? 1) *
-            //                   (data['scale'] ?? 1)) +
-            //           ((MediaQuery.of(context).size.width) /
-            //               (data['cols'] ?? 1) *
-            //               (data['col'] ?? 1)),
-            //       top: -0.5 *
-            //               ((MediaQuery.of(context).size.width) /
-            //                   (data['cols'] ?? 1) *
-            //                   (data['scale'] ?? 1)) +
-            //           ((MediaQuery.of(context).size.width) /
-            //               (data['cols'] ?? 1) *
-            //               (data['row'] ?? 1)),
-            //       child: Container(
-            //         decoration: BoxDecoration(
-            //           border: Border.all(),
-            //         ),
-            //         width: (MediaQuery.of(context).size.width) /
-            //             (data['cols'] ?? 1) *
-            //             (data['scale'] ?? 1),
-            //         height: (MediaQuery.of(context).size.width) /
-            //             (data['cols'] ?? 1) *
-            //             (data['scale'] ?? 1),
-            //         child: Text(
-            //           "$blink",
-            //           style: TextStyle(fontSize: 13),
-            //         ),
-            //         alignment: Alignment.center,
-            //       ),
-            //     );
-            //   },
-            // ),
-
-            /////////////---------------//
-            // _buildHoldWidget(context, 0),
-
-            // _buildHoldWidget(context, 1),
-
-            // _buildHoldWidget(context, 2),
-
-            _buildHoldWidget(context, 0),
-
-            // _buildHoldWidget(context, 4),
-
-            // _buildHoldWidget(context, 5),
-
-            // _buildHoldWidget(context, 6),
-            // _buildHoldWidget(context, 7),
-            // _buildHoldWidget(context, 8),
-            // _buildHoldWidget(context, 9),
-            // _buildHoldWidget(context, 10),
-            // _buildHoldWidget(context, 11),
-            // _buildHoldWidget(context, 12),
-            // _buildHoldWidget(context, 13),
-
-            // _buildHoldWidget(context, 14),
-            // _buildHoldWidget(context, 15),
-
-            // _buildHoldWidget(context, 16),
-            // _buildHoldWidget(context, 17),
-          ],
+        child: FutureBuilder<void>(
+          future: _instanceInit,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return AspectRatio(
+                aspectRatio: 1 /
+                    (_cameraController.value.previewSize?.aspectRatio ?? 4 / 3),
+                child: CameraPreview(_cameraController),
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         ),
       ),
     );
