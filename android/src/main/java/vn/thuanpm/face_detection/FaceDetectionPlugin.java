@@ -18,7 +18,6 @@ import faceDetection.FaceLandMark;
 public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
 
     private static MethodChannel methodChannel;
-    private static EventChannel eventChannel;
     private static final String METHOD_CHANNEL = "face_detection";
     private static final String EVENT_CHANNEL = "faceDetectStream";
     private static FaceDetect faceDetect;
@@ -42,7 +41,7 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, Ev
         methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), METHOD_CHANNEL);
         methodChannel.setMethodCallHandler(this);
         // event channel face detect
-        eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), EVENT_CHANNEL);
+        EventChannel eventChannel =  new EventChannel(flutterPluginBinding.getBinaryMessenger(), EVENT_CHANNEL);
         eventChannel.setStreamHandler(this);
     }
 
