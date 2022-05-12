@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -146,20 +145,22 @@ class _MyHomePageState extends State<MyHomePage> {
         if (idx < points.length) {
           data = points[idx];
         }
-
+        String rotation = '';
         if (points.length > 3) {
           print((points[3]['tt']));
-          if ((points[3]['tt']) > 93) {
-            print("Left");
-          } else if ((points[3]['tt']) < 88) {
-            print("Right");
+          if ((points[3]['tt']) > 90) {
+            rotation = "Left";
+          } else if ((points[3]['tt']) < 90) {
+            rotation = "Right";
           } else {
-            print("ahead");
+            rotation = "Ahead";
           }
         }
 
         if (data.isEmpty) {
-          return SizedBox.shrink();
+          return Container(
+            color: Colors.transparent,
+          );
         }
         return Positioned(
           left: -0.5 *
@@ -187,8 +188,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 (data['cols'] ?? 1) *
                 (data['scale'] ?? 1),
             child: Text(
-              "${data['row']}",
-              style: TextStyle(fontSize: 13),
+              '${data['scale']}',
+              style: TextStyle(fontSize: 13, color: Colors.red),
             ),
             alignment: Alignment.center,
           ),
@@ -242,9 +243,12 @@ class _MyHomePageState extends State<MyHomePage> {
             // _buildHoldWidget(context, 11),
             // _buildHoldWidget(context, 12),
             // _buildHoldWidget(context, 13),
-            // _buildHoldWidget(context, 14),
+
+            _buildHoldWidget(context, 14),
+
+            // _buildHoldWidget(context, 15),
             // _buildHoldWidget(context, 16),
-            // _buildHoldWidget(context, 16),
+            // _buildHoldWidget(context, 17),
 
             // StreamBuilder<Map<String, dynamic>>(
             //   stream: FaceDetection.faceDetectStream(
