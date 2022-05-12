@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // await FaceDetection.initFaceDetect().then((value) => print(value));
     FaceDetection.initFaceLandmark().then((value) => print(value));
     final cameras = await availableCameras();
-    _cameraController = CameraController(cameras[1], ResolutionPreset.medium,
+    _cameraController = CameraController(cameras[1], ResolutionPreset.low,
         imageFormatGroup: ImageFormatGroup.yuv420);
     await _cameraController.initialize();
     await _cameraController.startImageStream((image) {

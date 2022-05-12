@@ -68,13 +68,15 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, Ev
             Integer cols = call.argument("cols");
             assert (cols != null && rows != null);
             faceDetect.getFacesDetect(data, cols.longValue(), rows.longValue());
-            result.success("ok");
 
             streamData.put("type",(String) "faceDetect");
             streamData.put("cols", (int) faceDetect.getCols());
             streamData.put("rows", (int) faceDetect.getRows());
             streamData.put("faces", (String) faceDetect.getFaces());
+
+            result.success(streamData);
             onEventSinkCallback(streamData);
+            
             streamData.clear();
 
         } catch (Exception e) {
@@ -113,13 +115,15 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, Ev
             Integer cols = call.argument("cols");
             assert (cols != null && rows != null);
             faceLandMark.getFaceLandMark(data,cols.longValue(),rows.longValue());
-            result.success("ok");
-
+           
             streamData.put("type",(String) "faceLandMark");
             streamData.put("cols", (int) faceLandMark.getCols());
             streamData.put("rows", (int) faceLandMark.getRows());
             streamData.put("holes", (String) faceLandMark.getHolesFace());
+
+            result.success(streamData);
             onEventSinkCallback(streamData);
+            
             streamData.clear();
 
         } catch (Exception e) {

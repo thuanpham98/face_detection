@@ -49,13 +49,15 @@ public class SwiftFaceDetectionPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         let cols : Int = rawData["cols"] as! Int
         let data = Data((rawData["data"] as! FlutterStandardTypedData).data)
         _faceDetect?.getFacesDetect(data, cols: cols, rows: rows)
-        result("ok")
         
         streamData["type"] = "faceDetect"
         streamData["cols"] = _faceDetect?.cols
         streamData["rows"] = _faceDetect?.rows
         streamData["faces"] = _faceDetect?.faces
+
+        result(streamData)
         onEventSinkCallback(data: streamData)
+
         streamData.removeAll(keepingCapacity: false)
     }
     public func initFaceLandmark(_ call: FlutterMethodCall, result: @escaping FlutterResult){
@@ -72,7 +74,7 @@ public class SwiftFaceDetectionPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         let lp93 = Data((rawData["lp93"] as! FlutterStandardTypedData).data)
         let lp312 = Data((rawData["lp312"] as! FlutterStandardTypedData).data)
         _faceLandmark = FaceDetection.FaceDetectionInitFaceLandMark(faceCascade,puplocCascade,lp38,lp42,lp44,lp46,lp81,lp82,lp84,lp93,lp312)
-        result(_faceLandmark?.maxSize)
+        result("ok")
         
     }
     public func runFaceLandmark(_ call: FlutterMethodCall, result: @escaping FlutterResult){
@@ -82,15 +84,17 @@ public class SwiftFaceDetectionPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         let cols : Int = rawData["cols"] as! Int
         let data = Data((rawData["data"] as! FlutterStandardTypedData).data)
         _faceLandmark?.getFaceLandMark(data, cols: cols, rows: rows)
-        result("ok")
         
-        streamData.removeAll(keepingCapacity: false)
+       
         streamData["type"] = "faceLandMark"
         streamData["cols"] = _faceLandmark?.cols
         streamData["rows"] = _faceLandmark?.rows
         streamData["holes"] = _faceLandmark?.holesFace
+
+        result(streamData)
         onEventSinkCallback(data: streamData)
-        
+
+        streamData.removeAll(keepingCapacity: false)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
