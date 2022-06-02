@@ -112,8 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
       height: _savedImage.height,
       width: _savedImage.width,
       plane0: _savedImage.planes[0].bytes,
-      rotationAngle: 270,
-      isFlipVectical: true,
+      rotationAngle: 0,
+      // isFlipVectical: true,
       // isFlipHoriozntal: true,
     );
   }
@@ -126,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, snap) {
         Map<String, dynamic> data = {};
         List<Map<String, dynamic>> points = [];
+        print(snap.data?['numFace']);
         if (snap.hasData) {
           for (var i = 0; i < snap.data?['holes'][0].length; i++) {
             if (i % 5 == 0) {
