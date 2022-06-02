@@ -25,6 +25,7 @@ class FaceDetection {
           "rows": event['rows'],
           "cols": event['cols'],
           "faces": faces,
+          "numFace": event["num_face"],
         };
       } else if (event['type'] == FaceDetectionStreamType.faceLandMark.name) {
         final holes = jsonDecode(event['holes']);
@@ -32,6 +33,7 @@ class FaceDetection {
           "rows": event['rows'],
           "cols": event['cols'],
           'holes': holes,
+          "numFace": event["num_face"],
         };
       }
       return {};
