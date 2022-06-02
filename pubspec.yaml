@@ -1,11 +1,11 @@
 name: face_detection
 description: A flutter plugin for detecting face and detecting landmark on face, it use Go language for native
-version: 0.0.2
+version: 0.0.3
 homepage: https://pub.dev/packages/face_detection
 repository: https://github.com/thuanpham98/face_detection
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: ">=2.15.1 <3.0.0"
   flutter: ">=2.5.0"
 
 dependencies:

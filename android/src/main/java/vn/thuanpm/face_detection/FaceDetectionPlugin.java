@@ -73,6 +73,7 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, Ev
             streamData.put("cols", (int) faceDetect.getCols());
             streamData.put("rows", (int) faceDetect.getRows());
             streamData.put("faces", (String) faceDetect.getFaces());
+            streamData.put("num_face", (int) faceDetect.getNumFace());
 
             result.success(streamData);
             onEventSinkCallback(streamData);
@@ -120,6 +121,7 @@ public class FaceDetectionPlugin implements FlutterPlugin, MethodCallHandler, Ev
             streamData.put("cols", (int) faceLandMark.getCols());
             streamData.put("rows", (int) faceLandMark.getRows());
             streamData.put("holes", (String) faceLandMark.getHolesFace());
+            streamData.put("num_face", (int) faceLandMark.getNumFace());
 
             result.success(streamData);
             onEventSinkCallback(streamData);

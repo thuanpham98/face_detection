@@ -54,6 +54,7 @@ public class SwiftFaceDetectionPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         streamData["cols"] = _faceDetect?.cols
         streamData["rows"] = _faceDetect?.rows
         streamData["faces"] = _faceDetect?.faces
+        streamData["num_face"] = _faceDetect?.numFace
 
         result(streamData)
         onEventSinkCallback(data: streamData)
@@ -90,6 +91,7 @@ public class SwiftFaceDetectionPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         streamData["cols"] = _faceLandmark?.cols
         streamData["rows"] = _faceLandmark?.rows
         streamData["holes"] = _faceLandmark?.holesFace
+        streamData["num_face"] = _faceLandmark?.numFace
 
         result(streamData)
         onEventSinkCallback(data: streamData)
