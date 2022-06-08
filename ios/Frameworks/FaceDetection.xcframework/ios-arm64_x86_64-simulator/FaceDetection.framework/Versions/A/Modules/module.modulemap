@@ -1,0 +1,8 @@
+framework module "FaceDetection" {
+	header "ref.h"
+    header "FaceDetection.objc.h"
+    header "Universe.objc.h"
+    header "FaceDetection.h"
+
+    export *
+}
