@@ -19,7 +19,6 @@ class FaceDetection {
     _faceDetectStream ??= _eventChannel
         .receiveBroadcastStream()
         .map<Map<String, dynamic>>((event) {
-      print(event['type']);
       if (event['type'] == FaceDetectionStreamType.faceDetect.name) {
         final faces = jsonDecode(event['faces']);
         return {
