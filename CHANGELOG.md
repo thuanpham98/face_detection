@@ -1,4 +1,10 @@
 
+## 0.0.6
+
+- fix confix reserve path for IOS
+## 0.0.5
+
+- fix confix reserve path for IOS
 ## 0.0.4
 
 - fix confix IOS
