@@ -17,13 +17,13 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
 
   
-  # s.preserve_paths = 'Frameworks/FaceDetection.xcframework/**/*'
+  s.preserve_paths = 'Frameworks/FaceDetection.xcframework/**/*'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework FaceDetection' }
   # config path to frame word
   s.ios.vendored_frameworks ='Frameworks/FaceDetection.xcframework' 
 
   s.dependency 'Flutter'
-  # s.dependency 'Frameworks/FaceDetection.xcframework'
+  # s.dependency 'Frameworks/FaceDetection.xcframework/ios-arm64/FaceDetection.framework'
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
