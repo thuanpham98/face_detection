@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
@@ -41,32 +39,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late final CameraController _cameraController;
+  late CameraController _cameraController;
   late Future<void> _instanceInit;
-  late BehaviorSubject<CameraImage?> pipe;
+  late BehaviorSubject<CameraImage?> _pipe;
   late ProcessingCameraImage _processingCameraImage;
-  Uint8List? currentImage;
-  bool processing = false;
+  bool _processing = false;
 
   @override
   void initState() {
+    _pipe =
+      BehaviorSubject<CameraImage?>.seeded(null);
     _processingCameraImage = ProcessingCameraImage();
-    pipe = BehaviorSubject<CameraImage?>.seeded(null);
-    pipe.listen(_processingImage);
     _instanceInit = initCamera();
+    _pipe.listen(_processingImage);
     super.initState();
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
+    _pipe.close();
     super.dispose();
   }
 
   void _processingImage(CameraImage? img) async {
     try {
       if (img == null) {
-        processing = false;
+        _processing = false;
         return;
       }
 
@@ -81,9 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
           convertRetImage.width,
         );
       }
-      processing = false;
+      _processing = false;
     } catch (error) {
-      processing = false;
+      _processing = false;
       log(error.toString());
       const IgnorePointer();
     }
@@ -112,9 +111,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     await _cameraController.initialize();
     await _cameraController.startImageStream((image) {
-      if (!processing) {
-        processing = true;
-        pipe.sink.add(image);
+      if (!_processing) {
+        _processing = true;
+        _pipe.sink.add(image);
       }
     });
   }
@@ -207,8 +206,8 @@ class LandmarkWidget extends StatelessWidget {
               sizeRows = screenWidth / (data['cols'] ?? 1) * (data['row'] ?? 1),
               sizeCols = screenWidth / (data['cols'] ?? 1) * (data['col'] ?? 1);
           return Positioned(
-            left: -0.5 * sizeScale + sizeCols,
-            top: -0.5 * sizeScale + sizeRows,
+            left: sizeCols - 0.5 * sizeScale,
+            top: sizeRows - 0.5 * sizeScale,
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(),
