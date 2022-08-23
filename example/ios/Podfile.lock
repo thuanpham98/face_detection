@@ -1,5 +1,5 @@
 PODS:
-  - camera (0.0.1):
+  - camera_avfoundation (0.0.1):
     - Flutter
   - face_detection (0.0.1):
     - Flutter
@@ -8,14 +8,14 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - camera (from `.symlinks/plugins/camera/ios`)
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - face_detection (from `.symlinks/plugins/face_detection/ios`)
   - Flutter (from `Flutter`)
   - processing_camera_image (from `.symlinks/plugins/processing_camera_image/ios`)
 
 EXTERNAL SOURCES:
-  camera:
-    :path: ".symlinks/plugins/camera/ios"
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   face_detection:
     :path: ".symlinks/plugins/face_detection/ios"
   Flutter:
@@ -24,8 +24,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/processing_camera_image/ios"
 
 SPEC CHECKSUMS:
-  camera: 9993f92f2c793e87b65e35f3a23c70582afb05b1
-  face_detection: a3df9fae7e4f4f34afc5a6e7c7cbb3a90c01a59b
+  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
+  face_detection: 94bb21189b3bf4fdd2b31f1f5cf275b10f3e3938
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   processing_camera_image: 095bec249ab49bcd51493397d8f1d5f954172a8e
 

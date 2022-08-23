@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final cameras = await availableCameras();
 
-    _cameraController = CameraController(cameras[1], ResolutionPreset.high,
+    _cameraController = CameraController(cameras[1], ResolutionPreset.low,
         imageFormatGroup: ImageFormatGroup.yuv420);
 
     await _cameraController.initialize();
@@ -162,8 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          HoldWidget(context: context, idx: 14)
-
+          HoldWidget(context: context, idx: 0)
         ],
       ),
     );
@@ -214,16 +213,29 @@ class HoldWidget extends StatelessWidget {
 
         return Positioned(
           left: -0.5 *
-                  ((MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['scale'] ?? 1)) +
-                    ((MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['col'] ?? 1)),
-          top: -0.5 *((MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['scale'] ?? 1)) + 
-                      ((MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['row'] ?? 1)),
+                  ((MediaQuery.of(context).size.width) /
+                      (data['cols'] ?? 1) *
+                      (data['scale'] ?? 1)) +
+              ((MediaQuery.of(context).size.width) /
+                  (data['cols'] ?? 1) *
+                  (data['col'] ?? 1)),
+          top: -0.5 *
+                  ((MediaQuery.of(context).size.width) /
+                      (data['cols'] ?? 1) *
+                      (data['scale'] ?? 1)) +
+              ((MediaQuery.of(context).size.width) /
+                  (data['cols'] ?? 1) *
+                  (data['row'] ?? 1)),
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(),
             ),
-            width: (MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['scale'] ?? 1),
-            height: (MediaQuery.of(context).size.width) / (data['cols'] ?? 1) * (data['scale'] ?? 1),
+            width: (MediaQuery.of(context).size.width) /
+                (data['cols'] ?? 1) *
+                (data['scale'] ?? 1),
+            height: (MediaQuery.of(context).size.width) /
+                (data['cols'] ?? 1) *
+                (data['scale'] ?? 1),
             child: Text(
               '${data['scale']}',
               style: const TextStyle(fontSize: 13, color: Colors.red),
