@@ -43,21 +43,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late final CameraController _cameraController;
   late Future<void> _instanceInit;
-  final pipe = BehaviorSubject<CameraImage?>.seeded(null);
-  static final ProcessingCameraImage _processingCameraImage =
-      ProcessingCameraImage();
+  late BehaviorSubject<CameraImage?> pipe;
+  late ProcessingCameraImage _processingCameraImage;
   Uint8List? currentImage;
   bool processing = false;
-  final a = BehaviorSubject<Map<String, dynamic>>.seeded({
-    "row": 0,
-    "rows": 0,
-    "cols": 0,
-    "col": 0,
-    "scale": 0,
-    'q': 0,
-  });
-@override
+
+  @override
   void initState() {
+    _processingCameraImage = ProcessingCameraImage();
+    pipe = BehaviorSubject<CameraImage?>.seeded(null);
     pipe.listen(_processingImage);
     _instanceInit = initCamera();
     super.initState();
@@ -68,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _cameraController.dispose();
     super.dispose();
   }
-
 
   void _processingImage(CameraImage? img) async {
     try {
@@ -81,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       Image8bit? convertRetImage = convertImage(img, retImage!);
 
-      if ((convertRetImage != null)) {
+      if (convertRetImage != null) {
         await FaceDetection.getFaceLandMark(
           convertRetImage.data,
           convertRetImage.heigh,
@@ -94,26 +87,19 @@ class _MyHomePageState extends State<MyHomePage> {
       log(error.toString());
       const IgnorePointer();
     }
-    processing = false;
   }
 
-  
-
   Image8bit? convertImage(CameraImage oldImage, Image8bit newImage) {
-    Image8bit convertRetImage;
-    if ((newImage.heigh > oldImage.width) &&
-        (oldImage.height < oldImage.width)) {
+    if (newImage.heigh > oldImage.width && oldImage.height < oldImage.width) {
       int visai = newImage.heigh - oldImage.width;
-      convertRetImage = Image8bit(
+      return Image8bit(
           data: newImage.data.sublist(
               (visai) * (newImage.width), newImage.heigh * newImage.width),
           heigh: oldImage.width,
           width: oldImage.height);
     } else {
-      convertRetImage = newImage;
+      return newImage;
     }
-
-    return convertRetImage;
   }
 
   Future<void> initCamera() async {
@@ -131,7 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
         pipe.sink.add(image);
       }
     });
-    // }
   }
 
   Image8bit? _processImage(input) {
@@ -167,15 +152,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          HoldWidget(context: context, idx: 14),
+          LandmarkWidget(context: context, idx: 14),
         ],
       ),
     );
   }
 }
 
-class HoldWidget extends StatelessWidget {
-  const HoldWidget({
+class LandmarkWidget extends StatelessWidget {
+  const LandmarkWidget({
     Key? key,
     required this.context,
     required this.idx,
@@ -186,6 +171,8 @@ class HoldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return StreamBuilder<Map<String, dynamic>>(
       stream: FaceDetection.faceDetectStream(
               type: FaceDetectionStreamType.faceLandMark)
@@ -215,12 +202,10 @@ class HoldWidget extends StatelessWidget {
             return const SizedBox();
           }
 
-          double screenWidth = (MediaQuery.of(context).size.width),
-              sizeScale =
+          double sizeScale =
                   screenWidth / (data['cols'] ?? 1) * (data['scale'] ?? 1),
               sizeRows = screenWidth / (data['cols'] ?? 1) * (data['row'] ?? 1),
               sizeCols = screenWidth / (data['cols'] ?? 1) * (data['col'] ?? 1);
-
           return Positioned(
             left: -0.5 * sizeScale + sizeCols,
             top: -0.5 * sizeScale + sizeRows,
@@ -238,7 +223,6 @@ class HoldWidget extends StatelessWidget {
             ),
           );
         }
-
         return const SizedBox();
       },
     );
