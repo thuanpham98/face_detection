@@ -29,7 +29,6 @@
 @property (nonatomic) double angle;
 @property (nonatomic) double ioThreshold;
 @property (nonatomic) NSString* _Nonnull faces;
-@property (nonatomic) long numFace;
 - (void)getFacesDetect:(NSData* _Nullable)pixels cols:(long)cols rows:(long)rows;
 @end
 
@@ -48,7 +47,6 @@
 @property (nonatomic) double angle;
 @property (nonatomic) double ioThreshold;
 @property (nonatomic) NSString* _Nonnull faces;
-@property (nonatomic) long numFace;
 @property (nonatomic) NSString* _Nonnull holesFace;
 - (void)getFaceLandMark:(NSData* _Nullable)pixels cols:(long)cols rows:(long)rows;
 @end

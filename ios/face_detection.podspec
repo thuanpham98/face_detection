@@ -13,17 +13,20 @@ A new flutter plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'Classes/*.{h,m,swift}'
   # s.public_header_files = 'Classes/**/*.h'
-  s.ios.vendored_frameworks ='Frameworks/FaceDetection.xcframework'
-  s.preserve_paths = 'Frameworks/FaceDetection.xcframework'
+
+  
+  s.preserve_paths = 'Frameworks/FaceDetection.xcframework/**/*'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework FaceDetection' }
+  # config path to frame word
+  s.ios.vendored_frameworks ='Frameworks/FaceDetection.xcframework' 
 
   s.dependency 'Flutter'
-  # s.dependency 'FaceDetection'
+  # s.dependency 'Frameworks/FaceDetection.xcframework/ios-arm64/FaceDetection.framework'
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64 armv7 x86_64' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
 end
