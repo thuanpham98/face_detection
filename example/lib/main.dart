@@ -1,13 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
-import 'package:face_detection/face_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:processing_camera_image/processing_camera_image.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'package:face_detection/face_detection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +56,18 @@ class _MyHomePageState extends State<MyHomePage> {
     "scale": 0,
     'q': 0,
   });
+  @override
+  void initState() {
+    pipe.listen(_processingImage);
+    _instanceInit = initCamera();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
+  }
 
   void _processingImage(CameraImage? img) async {
     try {
@@ -81,19 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
     processing = false;
   }
 
-  @override
-  void initState() {
-    pipe.listen(_processingImage);
-    _instanceInit = initCamera();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _cameraController.dispose();
-    super.dispose();
-  }
-
   Image8bit? convertImage(CameraImage oldImage, Image8bit newImage) {
     Image8bit convertRetImage;
     if ((newImage.heigh > oldImage.width) &&
@@ -116,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final cameras = await availableCameras();
 
-    _cameraController = CameraController(cameras[1], ResolutionPreset.low,
+    _cameraController = CameraController(cameras[1], ResolutionPreset.high,
         imageFormatGroup: ImageFormatGroup.yuv420);
 
     await _cameraController.initialize();
@@ -162,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          HoldWidget(context: context, idx: 0)
+          HoldWidget(context: context, idx: 14)
         ],
       ),
     );
@@ -189,60 +191,52 @@ class HoldWidget extends StatelessWidget {
         Map<String, dynamic> data = {};
         List<Map<String, dynamic>> points = [];
         if (snap.hasData) {
-          for (var i = 0; i < snap.data?['holes'][0].length; i++) {
-            if (i % 5 == 0) {
-              points.add({
-                'rows': snap.data?['rows'],
-                'cols': snap.data?['cols'],
-                'row': snap.data?['holes'][0][i],
-                'col': snap.data?['holes'][0][i + 1],
-                'scale': snap.data?['holes'][0][i + 2],
-                'q': snap.data?['holes'][0][i + 3],
-                'tt': snap.data?['holes'][0][i + 4],
-              });
-            }
+          for (int i = 0, index = 0;
+              i < List.from(snap.data?['holes'][0] ?? []).length;
+              i = i + 5, index++) {
+            if (index > idx) continue;
+            points.add({
+              'rows': snap.data?['rows'],
+              'cols': snap.data?['cols'],
+              'row': snap.data?['holes'][0][i],
+              'col': snap.data?['holes'][0][i + 1],
+              'scale': snap.data?['holes'][0][i + 2],
+              'q': snap.data?['holes'][0][i + 3],
+              'tt': snap.data?['holes'][0][i + 4],
+            });
           }
-        }
-        if (idx < points.length) {
+          print(points.length);
           data = points[idx];
+
+          if (data.isEmpty) {
+            return const SizedBox();
+          }
+
+          double screenWidth = (MediaQuery.of(context).size.width),
+              sizeScale =
+                  screenWidth / (data['cols'] ?? 1) * (data['scale'] ?? 1),
+              sizeRows = screenWidth / (data['cols'] ?? 1) * (data['row'] ?? 1),
+              sizeCols = screenWidth / (data['cols'] ?? 1) * (data['col'] ?? 1);
+
+          return Positioned(
+            left: -0.5 * sizeScale + sizeCols,
+            top: -0.5 * sizeScale + sizeRows,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(),
+              ),
+              width: sizeScale,
+              height: sizeScale,
+              child: Text(
+                '${data['scale']}',
+                style: const TextStyle(fontSize: 13, color: Colors.red),
+              ),
+              alignment: Alignment.center,
+            ),
+          );
         }
 
-        if (data.isEmpty) {
-          return const SizedBox();
-        }
-
-        return Positioned(
-          left: -0.5 *
-                  ((MediaQuery.of(context).size.width) /
-                      (data['cols'] ?? 1) *
-                      (data['scale'] ?? 1)) +
-              ((MediaQuery.of(context).size.width) /
-                  (data['cols'] ?? 1) *
-                  (data['col'] ?? 1)),
-          top: -0.5 *
-                  ((MediaQuery.of(context).size.width) /
-                      (data['cols'] ?? 1) *
-                      (data['scale'] ?? 1)) +
-              ((MediaQuery.of(context).size.width) /
-                  (data['cols'] ?? 1) *
-                  (data['row'] ?? 1)),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-            ),
-            width: (MediaQuery.of(context).size.width) /
-                (data['cols'] ?? 1) *
-                (data['scale'] ?? 1),
-            height: (MediaQuery.of(context).size.width) /
-                (data['cols'] ?? 1) *
-                (data['scale'] ?? 1),
-            child: Text(
-              '${data['scale']}',
-              style: const TextStyle(fontSize: 13, color: Colors.red),
-            ),
-            alignment: Alignment.center,
-          ),
-        );
+        return const SizedBox();
       },
     );
   }
