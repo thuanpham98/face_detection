@@ -25,7 +25,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -34,9 +34,11 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 33
+        ndkVersion "25.2.9519653"
     }
-    buildToolsVersion '29.0.2'
+    ndkVersion '25.2.9519653'
+    buildToolsVersion '30.0.2'
 }
 
 dependencies {

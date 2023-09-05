@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // await FaceDetection.initFaceDetect().then((value) => print(value));
     FaceDetection.initFaceLandmark().then((value) => print(value));
     final cameras = await availableCameras();
-    _cameraController = CameraController(cameras[1], ResolutionPreset.low,
+    _cameraController = CameraController(cameras[1], ResolutionPreset.medium,
         imageFormatGroup: ImageFormatGroup.yuv420);
     await _cameraController.initialize();
     await _cameraController.startImageStream((image) {
@@ -112,8 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
       height: _savedImage.height,
       width: _savedImage.width,
       plane0: _savedImage.planes[0].bytes,
-      rotationAngle: 0,
-      // isFlipVectical: true,
+      rotationAngle: 270,
+      isFlipVectical: true,
       // isFlipHoriozntal: true,
     );
   }
