@@ -1,21 +1,21 @@
 PODS:
-  - camera (0.0.1):
+  - camera_avfoundation (0.0.1):
     - Flutter
-  - face_detection (0.0.1):
+  - face_detection (0.0.4):
     - Flutter
   - Flutter (1.0.0)
   - processing_camera_image (0.0.1):
     - Flutter
 
 DEPENDENCIES:
-  - camera (from `.symlinks/plugins/camera/ios`)
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - face_detection (from `.symlinks/plugins/face_detection/ios`)
   - Flutter (from `Flutter`)
   - processing_camera_image (from `.symlinks/plugins/processing_camera_image/ios`)
 
 EXTERNAL SOURCES:
-  camera:
-    :path: ".symlinks/plugins/camera/ios"
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   face_detection:
     :path: ".symlinks/plugins/face_detection/ios"
   Flutter:
@@ -24,11 +24,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/processing_camera_image/ios"
 
 SPEC CHECKSUMS:
-  camera: 9993f92f2c793e87b65e35f3a23c70582afb05b1
-  face_detection: a3df9fae7e4f4f34afc5a6e7c7cbb3a90c01a59b
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
+  face_detection: 43925549ce38ef18af5afcf1e0bd24ffced81629
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   processing_camera_image: 095bec249ab49bcd51493397d8f1d5f954172a8e
 
 PODFILE CHECKSUM: c4c93c5f6502fe2754f48404d3594bf779584011
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

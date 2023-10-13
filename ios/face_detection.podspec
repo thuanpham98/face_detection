@@ -4,19 +4,19 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'face_detection'
-  s.version          = '0.0.1'
+  s.version          = '0.0.4'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'http://github.com/thuanpham98'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Phạm Minh Thuận' => 'http://github.com/thuanpham98' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  # s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'Classes/*.{h,m,swift}'
   s.ios.vendored_frameworks ='Frameworks/FaceDetection.xcframework'
-  s.preserve_paths = 'Frameworks/FaceDetection.xcframework'
+  s.preserve_paths = 'Frameworks/FaceDetection.xcframework/**/*'
+  # s.resources    = ['Assets/**.*','Frameworks/FaceDetection.xcframework/**/*']
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework FaceDetection' }
 
   s.dependency 'Flutter'
@@ -24,6 +24,6 @@ A new flutter plugin project.
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64 armv7 x86_64' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 armv7 x86_64' }
   s.swift_version = '5.0'
 end
